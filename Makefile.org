@@ -277,10 +277,10 @@ sub_all: build_all
 
 build_all: build_libs build_apps build_tests build_tools
 
-build_libs: build_libcrypto build_libssl openssl.pc
+build_libs: build_libcrypto build_libssl openssl.pc openssl-static.pc
 
-build_libcrypto: build_crypto build_engines libcrypto.pc
-build_libssl: build_ssl libssl.pc
+build_libcrypto: build_crypto build_engines libcrypto.pc libcrypto-static.pc
+build_libssl: build_ssl libssl.pc libssl-static.pc
 
 build_crypto:
 	@dir=crypto; target=all; $(BUILD_ONE_CMD)
@@ -404,6 +404,46 @@ openssl.pc: Makefile
 	    echo 'Version: '$(VERSION); \
 	    echo 'Requires: libssl libcrypto' ) > openssl.pc
 
+libcrypto-static.pc: Makefile
+	@ ( echo 'prefix=$(INSTALLTOP)'; \
+	    echo 'exec_prefix=$${prefix}'; \
+	    echo 'libdir=$${exec_prefix}/$(LIBDIR)'; \
+	    echo 'includedir=$${prefix}/include'; \
+	    echo 'enginesdir=$${libdir}/engines'; \
+	    echo ''; \
+	    echo 'Name: OpenSSL-libcrypto'; \
+	    echo 'Description: OpenSSL cryptography library'; \
+	    echo 'Version: '$(VERSION); \
+	    echo 'Requires: '; \
+	    echo 'Libs: $${libdir}/libcrypto.a'; \
+	    echo 'Libs.private: $(EX_LIBS)'; \
+	    echo 'Cflags: -I$${includedir} $(KRB5_INCLUDES)' ) > $@
+
+libssl-static.pc: Makefile
+	@ ( echo 'prefix=$(INSTALLTOP)'; \
+	    echo 'exec_prefix=$${prefix}'; \
+	    echo 'libdir=$${exec_prefix}/$(LIBDIR)'; \
+	    echo 'includedir=$${prefix}/include'; \
+	    echo ''; \
+	    echo 'Name: OpenSSL-libssl'; \
+	    echo 'Description: Secure Sockets Layer and cryptography libraries'; \
+	    echo 'Version: '$(VERSION); \
+	    echo 'Requires.private: libcrypto'; \
+	    echo 'Libs: $${libdir}/libssl.a'; \
+	    echo 'Libs.private: $(EX_LIBS)'; \
+	    echo 'Cflags: -I$${includedir} $(KRB5_INCLUDES)' ) > $@
+
+openssl-static.pc: Makefile
+	@ ( echo 'prefix=$(INSTALLTOP)'; \
+	    echo 'exec_prefix=$${prefix}'; \
+	    echo 'libdir=$${exec_prefix}/$(LIBDIR)'; \
+	    echo 'includedir=$${prefix}/include'; \
+	    echo ''; \
+	    echo 'Name: OpenSSL'; \
+	    echo 'Description: Secure Sockets Layer and cryptography libraries and tools'; \
+	    echo 'Version: '$(VERSION); \
+	    echo 'Requires: libssl-static libcrypto-static' ) > $@
+
 Makefile: Makefile.org Configure config
 	@echo "Makefile is older than Makefile.org, Configure or config."
 	@echo "Reconfigure the source tree (via './config' or 'perl Configure'), please."
@@ -416,7 +456,7 @@ clean:	libclean
 	rm -f shlib/*.o *.o core a.out fluff rehash.time testlog make.log cctest cctest.c
 	@set -e; target=clean; $(RECURSIVE_BUILD_CMD)
 	rm -f $(LIBS)
-	rm -f openssl.pc libssl.pc libcrypto.pc
+	rm -f openssl*.pc libssl*.pc libcrypto*.pc
 	rm -f speed.* .pure
 	rm -f $(TARFILE)
 	@set -e; for i in $(ONEDIRS) ;\
@@ -614,6 +654,12 @@ install_sw:
 	chmod 644 $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig/libssl.pc
 	cp openssl.pc $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig
 	chmod 644 $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig/openssl.pc
+	cp libcrypto-static.pc $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig
+	chmod 644 $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig/libcrypto-static.pc
+	cp libssl-static.pc $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig
+	chmod 644 $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig/libssl-static.pc
+	cp openssl-static.pc $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig
+	chmod 644 $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig/openssl-static.pc
 
 install_html_docs:
 	here="`pwd`"; \
