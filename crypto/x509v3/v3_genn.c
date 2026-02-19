@@ -116,6 +116,9 @@ int GENERAL_NAME_cmp(GENERAL_NAME *a, GENERAL_NAME *b)
         return -1;
     switch (a->type) {
     case GEN_X400:
+        result = ASN1_STRING_cmp(a->d.x400Address, b->d.x400Address);
+        break;
+
     case GEN_EDIPARTY:
         result = ASN1_TYPE_cmp(a->d.other, b->d.other);
         break;
@@ -164,6 +167,9 @@ void GENERAL_NAME_set0_value(GENERAL_NAME *a, int type, void *value)
 {
     switch (type) {
     case GEN_X400:
+        a->d.x400Address = value;
+        break;
+
     case GEN_EDIPARTY:
         a->d.other = value;
         break;
@@ -199,6 +205,8 @@ void *GENERAL_NAME_get0_value(GENERAL_NAME *a, int *ptype)
         *ptype = a->type;
     switch (a->type) {
     case GEN_X400:
+        return a->d.x400Address;
+
     case GEN_EDIPARTY:
         return a->d.other;
 
