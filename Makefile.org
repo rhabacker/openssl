@@ -588,8 +588,8 @@ install_sw:
 				fi ); \
 				if expr $(PLATFORM) : 'mingw' > /dev/null; then \
 				(	case $$i in \
-						*crypto*) i=libeay32.dll;; \
-						*ssl*)    i=ssleay32.dll;; \
+						*crypto*) i=libcrypto-$(SHLIB_SONAMEVER).dll;; \
+						*ssl*)    i=libssl-$(SHLIB_SONAMEVER).dll;; \
 					esac; \
 					echo installing $$i; \
 	 				cp $$i $(INSTALL_PREFIX)$(INSTALLTOP)/bin/$$i.new; \
