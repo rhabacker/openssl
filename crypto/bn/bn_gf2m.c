@@ -1256,9 +1256,8 @@ int BN_GF2m_mod_solve_quad(BIGNUM *r, const BIGNUM *a, const BIGNUM *p,
  * Given sufficient room, the array is terminated with -1. Up to max elements
  * of the array will be filled.
  *
- * Return value is total number of array elements that would be filled if
- * array was large enough, including the terminating -1. Return 0 on invalid
- * input.
+ * Return value is the number of non-zero terms in the polynomial. Return 0 on
+ * invalid input.
  */
 int BN_GF2m_poly2arr(const BIGNUM *a, int p[], int max)
 {
@@ -1284,13 +1283,13 @@ int BN_GF2m_poly2arr(const BIGNUM *a, int p[], int max)
     }
 
     /* Guard against oversized explicit binary curve parameters. */
-    if (k > 0 && p[0] > OPENSSL_ECC_MAX_FIELD_BITS)
+    if (BN_num_bits(a) - 1 > OPENSSL_ECC_MAX_FIELD_BITS)
         return 0;
 
     if (k < max)
         p[k] = -1;
 
-    return k + 1;
+    return k;
 }
 
 /*
