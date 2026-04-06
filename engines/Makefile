@@ -111,7 +111,7 @@ install:
 		for l in $(LIBNAMES); do \
 			( echo installing $$l; \
 			  pfx=lib; \
-			  if [ "$(PLATFORM)" = "mingw" ]; then \
+			  if [ "$(PLATFORM)" = "mingw" -o "$(PLATFORM)" = "mingw64" ]; then \
 			       sfx=.dll; \
 			      cp $$pfx$$l$$sfx $(INSTALL_PREFIX)$(INSTALLTOP)/lib/engines/$$pfx$$l$$sfx.new; \
 			  elif expr "$(PLATFORM)" : "Cygwin" >/dev/null; then \
